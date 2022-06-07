@@ -30,7 +30,7 @@ export function getUserData () {
 }
 
 export function getFavoritesAmount () {
-  let valueStorage: unknown = JSON.parse(localStorage.getItem('favoritesAmount'));
+  let valueStorage: unknown = JSON.parse(localStorage.getItem('favoriteItems'));
   if(valueStorage instanceof Object) {
     return valueStorage
   }
@@ -38,9 +38,26 @@ export function getFavoritesAmount () {
 }
 
 export function toggleFavoriteItem(e) {
-  let jsonData = e.target.closest('.result').getAttribute('data-info-hotel')
+  let jsonData = e.target.closest('.result').getAttribute('data-info-hotel'),
+      storageData = {};
   if(!localStorage.getItem('favoriteItems')) {
-    let result = getDataJson(jsonData, ['id', 'name', 'img'])
-    console.log(result)
+    let result = getDataJson(jsonData, ['id', 'name', 'image'])
+    storageData[result.id] = result;
+    localStorage.setItem('favoriteItems', JSON.stringify(storageData))
+  } else {
+    let dataLocalStorage = getFavoritesAmount();
+    let result = getDataJson(jsonData, ['id', 'name', 'image'])
+    
+    if(!dataLocalStorage[result.id]) {
+      dataLocalStorage[result.id] = result;
+      console.log(dataLocalStorage)
+      localStorage.setItem('favoriteItems', JSON.stringify(dataLocalStorage))
+      return
+    }
+
+    if(dataLocalStorage[result.id]) {
+      delete dataLocalStorage[result.id] = result;
+      localStorage.setItem('favoriteItems', JSON.stringify(dataLocalStorage))
+    }
   }
 }
