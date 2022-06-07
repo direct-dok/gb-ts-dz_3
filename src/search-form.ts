@@ -2,7 +2,8 @@ import { renderBlock } from './lib.js'
 import Dates from './dates.js'
 import SearchFormData from './SearchFormData.interface.js'
 import Place from './Place.interface.js'
-import { fetchData } from './utility.js'
+import { fetchData, getTimestamp } from './utility.js'
+import { renderSearchResultsBlock, getItemsResultSearch } from './search-results.js'
 
 export function renderSearchFormBlock (dateToday:string, lastDayNextMoth:string) :void {
 
@@ -68,42 +69,41 @@ export function processingSearchForm(e): void {
 }
 
 export async function search(dataSearch: SearchFormData, callBack): void {
+  console.log(dataSearch);
   let fetchResult = null,
       url = `http://localhost:3030/places?` +
-            `checkInDate=${Date.parse(dataSearch.checkin)}&` +
-            `checkOutDate=${Date.parse(dataSearch.checkout)}&` +
-            `coordinates=${dataSearch.coordinates}`;
+            `checkInDate=${getTimestamp(dataSearch.checkin)}&` +
+            `checkOutDate=${getTimestamp(dataSearch.checkout)}&` +
+            `coordinates=${dataSearch.coordinates}`,
+      error = null,
+      resultSearch = null;
 
-  if (dataSearch.price != null) {
+  if (dataSearch.price != null
+    && dataSearch.price != "") {
     url += `&maxPrice=${dataSearch.price}`
   }
 
   fetchResult = await fetchData(url);
-
   console.log(fetchResult);
 
-  let objPlace: Place = {
-    name: '',
-    image: '',
-    description: '',
-    remoteness: 0,
-    bookedDates: []
-  }
-  callBack('Error', objPlace);
+  if(fetchResult.code == 400) error = fetchResult;
+  // getItemsResultSearch();
+
+  resultSearch = callBack(error, fetchResult);
+  renderSearchResultsBlock(resultSearch);
+  
 }
 
 interface ResultSearch {
-  (error?: Error, place?: Place): void
+  (error?: Error, places?: Object): String
 }
 
-const resultSearch: ResultSearch = (error?: Error, place?: Place): void => {
-  console.log('callback')
-  setTimeout(function() {
-    if(Math.random() < 0.5) {
-      console.log(place)
-    } else {
-      console.error(error)
-    }
-  }, 1000)
+const resultSearch: ResultSearch = (error?: Error, places?: Object): String => {
+  if(error) {
+    console.error(error.name, error.message, 'Error code: ' + error.code)
+    return 'Error';
+  }
+
+  return getItemsResultSearch(places);
   
 }

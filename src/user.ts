@@ -1,4 +1,5 @@
 import { renderBlock } from './lib.js'
+import { getDataJson } from './utility.js'
 
 export function renderUserBlock (userName:string, avatarImg:string, favoriteItemsAmount?:number) {
   const favoritesCaption = favoriteItemsAmount > 0 ? favoriteItemsAmount : 'ничего нет'
@@ -34,4 +35,12 @@ export function getFavoritesAmount () {
     return valueStorage
   }
   return String(valueStorage)
+}
+
+export function toggleFavoriteItem(e) {
+  let jsonData = e.target.closest('.result').getAttribute('data-info-hotel')
+  if(!localStorage.getItem('favoriteItems')) {
+    let result = getDataJson(jsonData, ['id', 'name', 'img'])
+    console.log(result)
+  }
 }

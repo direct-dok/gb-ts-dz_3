@@ -3,5 +3,6 @@ export default interface Place {
     image: String,
     description: String,
     remoteness: Number,
-    bookedDates: Number[]
+    bookedDates: Number[],
+    price: Number
 }

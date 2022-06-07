@@ -1,4 +1,6 @@
 import { renderBlock } from './lib.js'
+import { addListenerForElements, checkPageElements } from './utility.js'
+import { toggleFavoriteItem } from './user.js'
 
 export function renderSearchStubBlock () {
   renderBlock(
@@ -24,7 +26,18 @@ export function renderEmptyOrErrorSearchBlock (reasonMessage) {
   )
 }
 
-export function renderSearchResultsBlock () {
+export function renderSearchResultsBlock (resultSearch: String) {
+
+  if(resultSearch == 'Error') {
+    renderEmptyOrErrorSearchBlock('Произошла ошибка, попробуйте повторить запрос');
+    return;
+  }
+
+  if(!resultSearch) {
+    renderEmptyOrErrorSearchBlock('По данным параметрам нет ни одного подходящего результата. Попробуйте изменить параметры поиска и повторите!');
+    return;
+  }
+
   renderBlock(
     'search-results-block',
     `
@@ -40,49 +53,46 @@ export function renderSearchResultsBlock () {
         </div>
     </div>
     <ul class="results-list">
-      <li class="result">
-        <div class="result-container">
-          <div class="result-img-container">
-            <div class="favorites active"></div>
-            <img class="result-img" src="./img/result-1.png" alt="">
-          </div>	
-          <div class="result-info">
-            <div class="result-info--header">
-              <p>YARD Residence Apart-hotel</p>
-              <p class="price">13000&#8381;</p>
-            </div>
-            <div class="result-info--map"><i class="map-icon"></i> 2.5км от вас</div>
-            <div class="result-info--descr">Комфортный апарт-отель в самом сердце Санкт-Петербрга. К услугам гостей номера с видом на город и бесплатный Wi-Fi.</div>
-            <div class="result-info--footer">
-              <div>
-                <button>Забронировать</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </li>
-      <li class="result">
-        <div class="result-container">
-          <div class="result-img-container">
-            <div class="favorites"></div>
-            <img class="result-img" src="./img/result-2.png" alt="">
-          </div>	
-          <div class="result-info">
-            <div class="result-info--header">
-              <p>Akyan St.Petersburg</p>
-              <p class="price">13000&#8381;</p>
-            </div>
-            <div class="result-info--map"><i class="map-icon"></i> 1.1км от вас</div>
-            <div class="result-info--descr">Отель Akyan St-Petersburg с бесплатным Wi-Fi на всей территории расположен в историческом здании Санкт-Петербурга.</div>
-            <div class="result-info--footer">
-              <div>
-                <button>Забронировать</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </li>
+      ${resultSearch}
     </ul>
     `
   )
+
+  let elements = checkPageElements('.favorites');
+  if(elements.length) {
+    addListenerForElements('click', elements, toggleFavoriteItem)
+  }
+  
+}
+
+export function getItemsResultSearch(items: Array<String>): String {
+  let resultHTML = '';
+
+  items.forEach((elem) => {
+    resultHTML += `
+    <li class="result" data-info-hotel='${JSON.stringify(elem)}'>
+    <div class="result-container">
+      <div class="result-img-container">
+        <div class="favorites"></div>
+        <img class="result-img" src="${elem.image}" alt="${elem.name}">
+      </div>	
+      <div class="result-info">
+        <div class="result-info--header">
+          <p>${elem.name}</p>
+          <p class="price">${elem.price}&#8381;</p>
+        </div>
+        <div class="result-info--map"><i class="map-icon"></i> ${elem.remoteness}км от вас</div>
+        <div class="result-info--descr">${elem.description}</div>
+        <div class="result-info--footer">
+            <div>
+              <button>Забронировать</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </li>
+    `;
+  });
+
+  return resultHTML;
 }
