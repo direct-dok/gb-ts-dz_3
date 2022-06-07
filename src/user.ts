@@ -44,20 +44,24 @@ export function toggleFavoriteItem(e) {
     let result = getDataJson(jsonData, ['id', 'name', 'image'])
     storageData[result.id] = result;
     localStorage.setItem('favoriteItems', JSON.stringify(storageData))
+    e.target.classList.add('active');
+    return;
   } else {
     let dataLocalStorage = getFavoritesAmount();
     let result = getDataJson(jsonData, ['id', 'name', 'image'])
     
     if(!dataLocalStorage[result.id]) {
       dataLocalStorage[result.id] = result;
-      console.log(dataLocalStorage)
       localStorage.setItem('favoriteItems', JSON.stringify(dataLocalStorage))
-      return
+      e.target.classList.add('active');
+      return;
     }
 
     if(dataLocalStorage[result.id]) {
       delete dataLocalStorage[result.id] = result;
       localStorage.setItem('favoriteItems', JSON.stringify(dataLocalStorage))
+      e.target.classList.remove('active');
+      return;
     }
   }
 }

@@ -16,7 +16,6 @@ export function getTimestamp (data: String) {
 
 export function addListenerForElements(event, elements, callBack) {
     elements = Array.from(elements)
-    console.log(elements)
     elements.forEach(function(elem) {
         elem.addEventListener(event, callBack)
     })

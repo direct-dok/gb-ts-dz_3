@@ -69,7 +69,6 @@ export function processingSearchForm(e): void {
 }
 
 export async function search(dataSearch: SearchFormData, callBack): void {
-  console.log(dataSearch);
   let fetchResult = null,
       url = `http://localhost:3030/places?` +
             `checkInDate=${getTimestamp(dataSearch.checkin)}&` +
@@ -84,10 +83,8 @@ export async function search(dataSearch: SearchFormData, callBack): void {
   }
 
   fetchResult = await fetchData(url);
-  console.log(fetchResult);
 
   if(fetchResult.code == 400) error = fetchResult;
-  // getItemsResultSearch();
 
   resultSearch = callBack(error, fetchResult);
   renderSearchResultsBlock(resultSearch);

@@ -1,6 +1,6 @@
 import { renderBlock } from './lib.js'
 import { addListenerForElements, checkPageElements } from './utility.js'
-import { toggleFavoriteItem } from './user.js'
+import { toggleFavoriteItem, getFavoritesAmount } from './user.js'
 
 export function renderSearchStubBlock () {
   renderBlock(
@@ -69,11 +69,18 @@ export function getItemsResultSearch(items: Array<String>): String {
   let resultHTML = '';
 
   items.forEach((elem) => {
+
+    let favorite = getFavoritesAmount(),
+        favoriteTrue = false;
+    if(favorite && favorite[elem.id]) {
+      favoriteTrue = true;
+    }
+
     resultHTML += `
     <li class="result" data-info-hotel='${JSON.stringify(elem)}'>
     <div class="result-container">
       <div class="result-img-container">
-        <div class="favorites"></div>
+        <div class="favorites ${favoriteTrue ? 'active' : ''}"></div>
         <img class="result-img" src="${elem.image}" alt="${elem.name}">
       </div>	
       <div class="result-info">
